@@ -1,6 +1,33 @@
 - name: SNMP
   hosts: all
   sudo: true
-  templates:
-    
+  handlers:
+  - name: restart service
+    service: name=snmpd state=restarted
   tasks:
+  - name: Install snmpd (Debian)
+    when: ansible_distribution == 'Debian'
+    apt: name=snmpd state=latest
+    notify: restart service
+  - name: Install net-snmp (FreeBSD)
+    when: ansible_distribution == 'FreeBSD'
+    pkgng: name=net-snmp state=present
+    notify: restart service
+
+  - name: Enable service (FreeBSD)
+    when: ansible_distribution == 'FreeBSD'
+    lineinfile: dest=/etc/rc.conf regexp=^snmpd_enable= line=snmpd_enable=YES
+  - name: Set config file (FreeBSD)
+    when: ansible_distribution == 'FreeBSD'
+    lineinfile: dest=/etc/rc.conf regexp=^snmpd_conffile= line=snmpd_conffile=/etc/snmpd.conf
+
+  - name: Creates etc/ directory
+    file: path=/etc/snmp state=directory
+    notify: restart service
+
+  - name: Paste config
+    template: src=templates/snmpd.conf dest=/etc/snmp/snmpd.conf
+    notify: restart service
+  - name: Paste distro script
+    template: src=templates/distro dest=/usr/bin/distro
+    notify: restart service
