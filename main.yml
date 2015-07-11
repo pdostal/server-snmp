@@ -1,0 +1,6 @@
+- name: SNMP
+  hosts: all
+  sudo: true
+  templates:
+    
+  tasks:
