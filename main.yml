@@ -19,7 +19,7 @@
     lineinfile: dest=/etc/rc.conf regexp=^snmpd_enable= line=snmpd_enable=YES
   - name: Set config file (FreeBSD)
     when: ansible_distribution == 'FreeBSD'
-    lineinfile: dest=/etc/rc.conf regexp=^snmpd_conffile= line=snmpd_conffile=/etc/snmpd.conf
+    lineinfile: dest=/etc/rc.conf regexp=^snmpd_conffile= line=snmpd_conffile=/etc/snmp/snmpd.conf
 
   - name: Creates etc/ directory
     file: path=/etc/snmp state=directory
