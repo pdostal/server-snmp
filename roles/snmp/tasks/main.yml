@@ -1,11 +1,11 @@
 - name: Install snmpd (Debian)
   when: ansible_distribution == 'Debian'
   apt: name=snmpd state=latest
-  notify: restart service
+  notify: restart snmpd
 - name: Install net-snmp (FreeBSD)
   when: ansible_distribution == 'FreeBSD'
   pkgng: name=net-snmp state=present
-  notify: restart service
+  notify: restart snmpd
 
 - name: Enable service (FreeBSD)
   when: ansible_distribution == 'FreeBSD'
@@ -16,11 +16,11 @@
 
 - name: Creates etc/ directory
   file: path=/etc/snmp state=directory
-  notify: restart service
+  notify: restart snmpd
 
 - name: Paste config
   template: src=snmpd.conf dest=/etc/snmp/snmpd.conf
-  notify: restart service
+  notify: restart snmpd
 - name: Paste distro script
   template: src=distro dest=/usr/bin/distro
-  notify: restart service
+  notify: restart snmpd

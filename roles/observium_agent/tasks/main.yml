@@ -1,0 +1,33 @@
+- name: Install xinetd (Debian)
+  when: ansible_distribution == 'Debian'
+  apt: name=xinetd state=latest
+  notify: restart xinetd
+- name: Install xinetd (FreeBSD)
+  when: ansible_distribution == 'FreeBSD'
+  pkgng: name=xinetd state=present
+  notify: restart xinetd
+
+- name: Enable service (FreeBSD)
+  when: ansible_distribution == 'FreeBSD'
+  lineinfile: dest=/etc/rc.conf regexp=^xinetd_enable= line=xinetd_enable=YES
+
+- name: Creates observium_agent directory in lib/
+  file: path=/usr/lib/observium_agent state=directory
+  notify: restart xinetd
+- name: Creates observium_agent local/ subdirectory in lib/
+  file: path=/usr/lib/observium_agent/local state=directory
+  notify: restart xinetd
+- name: Creates xinetd config directory
+  file: path=/etc/xinetd.d state=directory
+  notify: restart xinetd
+
+- name: Include xinetd configs (FreeBSD)
+  when: ansible_distribution == 'FreeBSD'
+  lineinfile: create=yes dest=/usr/local/etc/xinetd.conf regexp=xinetd\.d line='includedir /etc/xinetd.d'
+
+- name: Paste observium_agent xinetd config
+  template: src=observium_agent_xinetd dest=/etc/xinetd.d/observium_agent_xinetd
+  notify: restart xinetd
+- name: Paste observium_agent script
+  template: src=observium_agent dest=/usr/bin/observium_agent
+  notify: restart xinetd

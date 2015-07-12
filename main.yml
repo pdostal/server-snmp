@@ -3,3 +3,4 @@
   sudo: true
   roles:
   - snmp
+  - observium_agent
